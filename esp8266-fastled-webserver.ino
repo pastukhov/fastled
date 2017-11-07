@@ -15,7 +15,7 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
+#define FASTLED_ESP8266_NODEMCU_PIN_ORDER
 #include "FastLED.h"
 FASTLED_USING_NAMESPACE
 
@@ -31,7 +31,7 @@ extern "C" {
 #include "GradientPalettes.h"
 
 #define RECV_PIN 12
-IRrecv irReceiver(RECV_PIN);
+//IRrecv irReceiver(RECV_PIN);
 
 #include "Commands.h"
 
@@ -41,15 +41,18 @@ const bool apMode = false;
 const char WiFiAPPSK[] = "";
 
 // Wi-Fi network to connect to (if not in AP mode)
-const char* ssid = "";
-const char* password = "";
+const char* ssid = "o3-prod";
+const char* password = "mwwemzu7";
 
 ESP8266WebServer server(80);
 
-#define DATA_PIN      D8     // for Huzzah: Pins w/o special function:  #4, #5, #12, #13, #14; // #16 does not work :(
-#define LED_TYPE      WS2812
-#define COLOR_ORDER   GRB
-#define NUM_LEDS      24
+#define LED_PIN 2
+#define CLOCK_PIN 3
+#define COLOR_ORDER BGR
+#define CHIPSET     APA102
+#define NUM_LEDS    10
+
+
 
 #define MILLI_AMPS         2000     // IMPORTANT: set here the max milli-Amps of your power supply 5V 2A = 2000
 #define FRAMES_PER_SECOND  120 // here you can control the speed. With the Access Point / Web Server the animations run a bit slower.
@@ -102,8 +105,10 @@ void setup(void) {
   delay(100);
   Serial.setDebugOutput(true);
 
-  FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS);         // for WS2812 (Neopixel)
+  //FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS);         // for WS2812 (Neopixel)
   //FastLED.addLeds<LED_TYPE,DATA_PIN,CLK_PIN,COLOR_ORDER>(leds, NUM_LEDS); // for APA102 (Dotstar)
+  FastLED.addLeds<CHIPSET, LED_PIN, CLOCK_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
+
   FastLED.setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(brightness);
   FastLED.setMaxPowerInVoltsAndMilliamps(5, MILLI_AMPS);
@@ -115,7 +120,7 @@ void setup(void) {
 
   FastLED.setBrightness(brightness);
 
-  irReceiver.enableIRIn(); // Start the receiver
+//  irReceiver.enableIRIn(); // Start the receiver
 
   Serial.println();
   Serial.print( F("Heap: ") ); Serial.println(system_get_free_heap_size());
